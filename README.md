@@ -1,5 +1,6 @@
 # PyBitrix
 ![version](https://img.shields.io/pypi/v/pybitrix?color=%237c4dff&style=for-the-badge)
+![downloads](https://img.shields.io/pypi/dd/pybitrix?style=for-the-badge)
 ---
 PyBitrix is my lightweight implementation of Bitrix 24 REST API wrapper that I use in my own applications/integrations
 ### Requirements
