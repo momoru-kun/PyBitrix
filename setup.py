@@ -12,7 +12,7 @@ setuptools.setup(
     description="PyBitrix is my lightweight implementation of Bitrix 24 REST API wrapper",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/momoru-kun/PyBitrix",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

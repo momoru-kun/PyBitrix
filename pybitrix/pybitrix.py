@@ -132,5 +132,4 @@ class PyBitrix:
             
             # Repeat API request after renew token
             result = self.callBatch(batch)
-        print("URI: {}\nBatch: {}".format(uri, batch))
         return result
