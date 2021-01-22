@@ -20,7 +20,7 @@ class PyBitrix:
             self.inbound_hook = inbound_hook
         else:
             self.inbound_hook = False
-            self.oauth_uri = 'https://oauth.bitrix.info/oauth/token/'
+            self.oauth_url = 'https://oauth.bitrix.info/oauth/token/'
             self.endpoint = "https://{domain}/rest/".format(domain=domain)
             self.access_token = access_token
             self.refresh_token = refresh_token
