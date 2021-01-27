@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="PyBitrix",
-    version="1.0.3",
+    version="1.0.4",
     install_requires=['requests'],
     author="Aleksandr Lenets",
     author_email="wowgonit@gmail.com",
@@ -31,5 +31,5 @@ setuptools.setup(
 
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.5',
 )

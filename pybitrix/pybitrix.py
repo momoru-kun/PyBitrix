@@ -36,7 +36,7 @@ class PyBitrix:
         # Make call to oauth server
         result = requests.post(self.oauth_url, json={
             'grant_type': 'refresh_token', 
-            'client_id': self.client_id, 
+            'client_id': self.access_token, 
             'client_secret': self.client_secret, 
             'refresh_token': self.refresh_token
         }).text
