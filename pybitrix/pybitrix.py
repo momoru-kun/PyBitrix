@@ -37,7 +37,7 @@ class PyBitrix:
         result = requests.post(self.oauth_url, json={
             'grant_type': 'refresh_token', 
             'client_id': self.access_token, 
-            'client_secret': self.client_secret, 
+            'client_secret': self.app_secret, 
             'refresh_token': self.refresh_token
         }).text
 
@@ -70,6 +70,8 @@ class PyBitrix:
             uri = self.endpoint + method
             params['auth'] = self.access_token
         
+        # print("[PyBitrix]: URI: {}".format(uri))
+        # print("[PyBitrix]: params: {}".format(params))
         r = ""
         try:
             r = requests.post(uri, json=params).text
@@ -82,7 +84,7 @@ class PyBitrix:
             self.last_request_time = time()
             return {'status': False, 'error': 'Error on decode BX24 response', 'response': r}
         
-        if result.get('error') in ('NO_AUTH_FOUND', 'expired_token'):
+        if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
             result = self.refresh_tokens()
             if result['stauts'] is not True:
                 return result
@@ -116,7 +118,7 @@ class PyBitrix:
         r=""
         result={}
         try:
-            r = requests.post(uri, json=({'halt': halt, 'cmd': batch}))
+            r = requests.post(uri, json=({'halt': halt, 'cmd': batch, 'auth': self.access_token}))
             result = json.loads(r.text)
         except requests.exceptions.ReadTimeout:
             return {'status': False, 'error': 'Timeout waiting expired'}
@@ -125,8 +127,9 @@ class PyBitrix:
         except ValueError:
             return {'status': False, 'error': 'Error on decode BX24 response', 'response': r}
         
-        if result.get('error') in ('NO_AUTH_FOUND', 'expired_token'):
+        if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
             result = self.refresh_tokens()
+            print(result)
             if result['stauts'] is not True:
                 return result
             
