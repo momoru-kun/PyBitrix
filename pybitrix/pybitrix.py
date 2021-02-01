@@ -52,7 +52,7 @@ class PyBitrix:
 
         return {'status': True}
 
-    def call(self, method:str, params:dict=None) -> dict:
+    def call(self, method:str, params:dict={}) -> dict:
         """ Makes call to bitrix24 REST and return result
         :param method: REST API Method you want to call
         :params: Request params
@@ -86,7 +86,7 @@ class PyBitrix:
         
         if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
             result = self.refresh_tokens()
-            if result['stauts'] is not True:
+            if result['status'] is not True:
                 return result
             
             # Repeat API request after renew token
@@ -130,7 +130,7 @@ class PyBitrix:
         if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
             result = self.refresh_tokens()
             print(result)
-            if result['stauts'] is not True:
+            if result['status'] is not True:
                 return result
             
             # Repeat API request after renew token
