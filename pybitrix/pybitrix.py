@@ -69,9 +69,7 @@ class PyBitrix:
         else:
             uri = self.endpoint + method
             params['auth'] = self.access_token
-        
-        # print("[PyBitrix]: URI: {}".format(uri))
-        # print("[PyBitrix]: params: {}".format(params))
+
         r = ""
         try:
             r = requests.post(uri, json=params).text
@@ -102,11 +100,12 @@ class PyBitrix:
         :batch params: Params for batch methods. Eg. {"deals": ['select[]=TITLE', 'order[ID]=DSC', 'filter[<ID]=92']}
         :return: Batch result
         """
+        request = {'halt': halt}
         if self.inbound_hook:
             uri = self.inbound_hook + '/' + 'batch'
         else:
             uri = self.endpoint + 'batch'
-            batch['auth'] = self.access_token
+            request['auth'] = self.access_token
 
         for key, params in batch_params.items():
             for param in range(0, len(params)):
@@ -115,10 +114,11 @@ class PyBitrix:
                 else:
                     batch[key] += "&{}".format(batch_params[key][param])
 
+        request['cmd'] = batch
         r=""
         result={}
         try:
-            r = requests.post(uri, json=({'halt': halt, 'cmd': batch, 'auth': self.access_token}))
+            r = requests.post(uri, json=request)
             result = json.loads(r.text)
         except requests.exceptions.ReadTimeout:
             return {'status': False, 'error': 'Timeout waiting expired'}
@@ -129,7 +129,6 @@ class PyBitrix:
         
         if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
             result = self.refresh_tokens()
-            print(result)
             if result['status'] is not True:
                 return result
             
