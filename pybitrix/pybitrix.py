@@ -3,9 +3,11 @@ from time import time, sleep
 import requests
 import json
 
+
 class PyBitrix:
     """Class for working with Bitrix24 REST API"""
-    def __init__(self, inbound_hook:str=None, domain="", access_token ="", refresh_token="", app_id="", app_secret=""):
+
+    def __init__(self, inbound_hook: str = None, domain="", access_token="", refresh_token="", app_id="", app_secret=""):
         """Bitrix24 Constructor
         :param inbound_hook: If you access Bitrix REST API via inbound webhook"  
         :param domain: Bitrix24 domain (returns in GET params with key 'DOMAIN' when requesting your app)
@@ -15,7 +17,6 @@ class PyBitrix:
         :param app_secret: Your local (or marketplace) application secret key - if you think than you don't need to refresh tokens leave it blank
         """
 
-        self.last_request_time = 0
         if inbound_hook != None:
             self.inbound_hook = inbound_hook
         else:
@@ -27,17 +28,16 @@ class PyBitrix:
             self.app_id = app_id
             self.app_secret = app_secret
 
-
     def refresh_tokens(self) -> dict:
         """Refresh access token from Bitrix OAuth server
         :return: dict with refreshing status  
         """
-        
+
         # Make call to oauth server
         result = requests.post(self.oauth_url, json={
-            'grant_type': 'refresh_token', 
-            'client_id': self.access_token, 
-            'client_secret': self.app_secret, 
+            'grant_type': 'refresh_token',
+            'client_id': self.access_token,
+            'client_secret': self.app_secret,
             'refresh_token': self.refresh_token
         }).text
 
@@ -52,16 +52,12 @@ class PyBitrix:
 
         return {'status': True}
 
-    def call(self, method:str, params:dict={}) -> dict:
+    def call(self, method: str, params: dict = {}) -> dict:
         """ Makes call to bitrix24 REST and return result
         :param method: REST API Method you want to call
         :params: Request params
         :return: Call result
         """
-        if self.last_request_time - time() <= 0.5:
-            # Bitrix requests rate limitation is 2 req per second. 
-            # So if we have requests delta less than 0.5, we need to suspend our request for a 0.9 second (in theory, is synced world we can't reach rate like this but anyway :) 
-            sleep(0.9) 
 
         result = {}
         if self.inbound_hook:
@@ -78,22 +74,23 @@ class PyBitrix:
             return {'status': False, 'error': 'Timeout waiting expired'}
         except requests.exceptions.ConnectionError:
             return {'status': False, 'error': 'Could not connect to bx24 resource', 'uri': uri}
-        except ValueError:
-            self.last_request_time = time()
-            return {'status': False, 'error': 'Error on decode BX24 response', 'response': r}
-        
+
+        while result.get('error') == 'QUERY_LIMIT_EXCEEDED':
+            sleep(0.3)
+            r = requests.post(uri, json=params).text
+            result = json.loads(r)
+
         if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
             result = self.refresh_tokens()
             if result['status'] is not True:
                 return result
-            
+
             # Repeat API request after renew token
             result = self.call(method, params)
 
-        self.last_request_time = time()
         return result
 
-    def callBatch(self, batch: dict, batch_params:dict = {}, halt=False) -> dict:
+    def callBatch(self, batch: dict, batch_params: dict = {}, halt=False) -> dict:
         """ Creates Bitrix Batch and calls them
         :param batch: Dict  with call name and method to call in batch. Eg. {"deals": "crm.deal.list", "fields": "crm.deal.fields"}
         :param halt: Stop batch if error in method 
@@ -115,8 +112,8 @@ class PyBitrix:
                     batch[key] += "&{}".format(batch_params[key][param])
 
         request['cmd'] = batch
-        r=""
-        result={}
+        r = ""
+        result = {}
         try:
             r = requests.post(uri, json=request)
             result = json.loads(r.text)
@@ -126,12 +123,17 @@ class PyBitrix:
             return {'status': False, 'error': 'Could not connect to bx24 resource', 'uri': uri}
         except ValueError:
             return {'status': False, 'error': 'Error on decode BX24 response', 'response': r}
-        
+
+        while result.get('error') == 'QUERY_LIMIT_EXCEEDED':
+            sleep(0.3)
+            r = requests.post(uri, json=params).text
+            result = json.loads(r)
+
         if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
             result = self.refresh_tokens()
             if result['status'] is not True:
                 return result
-            
+
             # Repeat API request after renew token
             result = self.callBatch(batch)
         return result
