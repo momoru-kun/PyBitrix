@@ -74,7 +74,7 @@ class PyBitrix:
             return {'status': False, 'error': 'Timeout waiting expired'}
         except requests.exceptions.ConnectionError:
             if 'https://' in self.endpoint:
-                self.endpoint.replace('https://', 'http://')
+                self.endpoint = self.endpoint.replace('https://', 'http://')
                 return self.call(method, params)
             else:
                 return {'status': False, 'error': 'Could not connect to bx24 resource', 'uri': uri}
