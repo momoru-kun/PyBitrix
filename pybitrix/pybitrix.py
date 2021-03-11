@@ -73,7 +73,11 @@ class PyBitrix:
         except requests.exceptions.ReadTimeout:
             return {'status': False, 'error': 'Timeout waiting expired'}
         except requests.exceptions.ConnectionError:
-            return {'status': False, 'error': 'Could not connect to bx24 resource', 'uri': uri}
+            if 'https://' in self.endpoint:
+                self.endpoint.replace('https://', 'http://')
+                return self.call(method, params)
+            else:
+                return {'status': False, 'error': 'Could not connect to bx24 resource', 'uri': uri}
 
         while result.get('error') == 'QUERY_LIMIT_EXCEEDED':
             sleep(0.3)
@@ -87,6 +91,8 @@ class PyBitrix:
 
             # Repeat API request after renew token
             result = self.call(method, params)
+        
+        
 
         return result
 
