@@ -7,7 +7,7 @@ import json
 class PyBitrix:
     """Class for working with Bitrix24 REST API"""
 
-    def __init__(self, inbound_hook: str = None, domain="", access_token="", refresh_token="", app_id="", app_secret=""):
+    def __init__(self, inbound_hook: str = None, domain="", access_token="", refresh_token="", app_id="", app_secret="", enforce_http=False):
         """Bitrix24 Constructor
         :param inbound_hook: If you access Bitrix REST API via inbound webhook"  
         :param domain: Bitrix24 domain (returns in GET params with key 'DOMAIN' when requesting your app)
@@ -15,14 +15,15 @@ class PyBitrix:
         :param refresh_token: Refresh token for reveal new access token - if you think than you don't need to refresh tokens leave it blank
         :param app_id: Your local (or marketplace) application ID - if you think than you don't need to refresh tokens leave it blank 
         :param app_secret: Your local (or marketplace) application secret key - if you think than you don't need to refresh tokens leave it blank
+        :param enforce_http: enforce pybitrix to use only http protocol without ssl
         """
 
         if inbound_hook != None:
             self.inbound_hook = inbound_hook
         else:
             self.inbound_hook = False
-            self.oauth_url = 'https://oauth.bitrix.info/oauth/token/'
-            self.endpoint = "https://{domain}/rest/".format(domain=domain)
+            self.oauth_url = 'https://oauth.bitrix.info/oauth/token/' 
+            self.endpoint = "https://{domain}/rest/".format(domain=domain) if not enforce_http else "http://{domain}/rest/".format(domain=domain)
             self.access_token = access_token
             self.refresh_token = refresh_token
             self.app_id = app_id
