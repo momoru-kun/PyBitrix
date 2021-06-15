@@ -1,4 +1,4 @@
-from time import time, sleep
+from time import sleep
 
 import requests
 import json
@@ -22,8 +22,9 @@ class PyBitrix:
             self.inbound_hook = inbound_hook
         else:
             self.inbound_hook = False
-            self.oauth_url = 'https://oauth.bitrix.info/oauth/token/' 
-            self.endpoint = "https://{domain}/rest/".format(domain=domain) if not enforce_http else "http://{domain}/rest/".format(domain=domain)
+            self.oauth_url = 'https://oauth.bitrix.info/oauth/token/'
+            self.endpoint = "https://{domain}/rest/".format(
+                domain=domain) if not enforce_http else "http://{domain}/rest/".format(domain=domain)
             self.access_token = access_token
             self.refresh_token = refresh_token
             self.app_id = app_id
@@ -92,8 +93,6 @@ class PyBitrix:
 
             # Repeat API request after renew token
             result = self.call(method, params)
-        
-        
 
         return result
 
@@ -119,28 +118,6 @@ class PyBitrix:
                     batch[key] += "&{}".format(batch_params[key][param])
 
         request['cmd'] = batch
-        r = ""
-        result = {}
-        try:
-            r = requests.post(uri, json=request)
-            result = json.loads(r.text)
-        except requests.exceptions.ReadTimeout:
-            return {'status': False, 'error': 'Timeout waiting expired'}
-        except requests.exceptions.ConnectionError:
-            return {'status': False, 'error': 'Could not connect to bx24 resource', 'uri': uri}
-        except ValueError:
-            return {'status': False, 'error': 'Error on decode BX24 response', 'response': r}
-
-        while result.get('error') == 'QUERY_LIMIT_EXCEEDED':
-            sleep(0.3)
-            r = requests.post(uri, json=params).text
-            result = json.loads(r)
-
-        if result.get('error') == 'NO_AUTH_FOUND' or result.get('error') == 'expired_token':
-            result = self.refresh_tokens()
-            if result['status'] is not True:
-                return result
-
-            # Repeat API request after renew token
-            result = self.callBatch(batch)
+        
+        result = self.call('batch', request)
         return result

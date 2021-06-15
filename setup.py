@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="PyBitrix",
-    version="1.1.4",
-    install_requires=['requests'],
+    version="1.2.0",
+    install_requires=['requests', 'aiohttp'],
     author="Aleksandr Lenets",
     author_email="wowgonit@gmail.com",
     description="PyBitrix is my lightweight implementation of Bitrix 24 REST API wrapper",
