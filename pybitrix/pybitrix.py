@@ -46,12 +46,12 @@ class PyBitrix:
         """
 
         # Make call to oauth server
-        result = requests.post(self.oauth_url, json={
+        result = requests.get(self.oauth_url, params={
             'grant_type': 'refresh_token',
             'client_id': self.app_id,
             'client_secret': self.app_secret,
             'refresh_token': self.refresh_token
-        }).text
+        })
 
         try:
             result_json = json.loads(result)
@@ -140,6 +140,6 @@ class PyBitrix:
                     batch[key] += "&{}".format(batch_params[key][param])
 
         request['cmd'] = batch
-        
+
         result = self.call('batch', request)
         return result

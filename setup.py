@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="PyBitrix",
-    version="1.2.5",
+    version="1.2.6",
     install_requires=['requests', 'aiohttp'],
     author="Aleksandr Lenets",
     author_email="wowgonit@gmail.com",
@@ -22,11 +22,11 @@ setuptools.setup(
 
         'Natural Language :: Russian',
         'Natural Language :: English',
-        
+
         'Topic :: Software Development :: Libraries :: Python Modules',
-        
+
         "Programming Language :: Python :: 3",
-        
+
         "License :: OSI Approved :: MIT License",
 
         "Operating System :: OS Independent",
