@@ -51,13 +51,13 @@ class PyBitrix:
             'client_id': self.app_id,
             'client_secret': self.app_secret,
             'refresh_token': self.refresh_token
-        })
+        }).text
 
         try:
             result_json = json.loads(result)
 
             # Renew tokens
-            self.auth_token = result_json['access_token']
+            self.access_token = result_json['access_token']
             self.refresh_token = result_json['refresh_token']
         except (ValueError, KeyError):
             return {'status': False, 'error': 'Error on decode OAuth response', 'response': result}
